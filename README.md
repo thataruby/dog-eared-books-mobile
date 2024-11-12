@@ -144,3 +144,260 @@ Both const and final indicate that a variable cannot be changed, but there are s
 - The value of a final variable can be assigned at runtime (when the app is running), whereas the value of a const variable must be known at compile time.
 - Variables declared with final are more suitable for values that can only be determined when the app is running, for example, if the variable depends on a condition or calculation. While const variables must be defined in the code beforehand.
 - const variables are more optimized compared to final.
+</details>
+
+<details>
+<Summary><b>Assignment 8</b></summary>
+## Step-by-Step Project Implementation
+### Create a new form page
+
+1. I created two new directories: lib/screens and lib/widgets, moved menu.dart to lib/screens
+2. Then I created a new file book_form.dart
+```dart
+  class BookFormPage extends StatefulWidget {
+    const BookFormPage({super.key});
+
+    @override
+    State<BookFormPage> createState() => _BookFormPageState();
+  }
+```
+3. I used 5 input elements (the same as my Django project) and did input validation for each. I also included a save button that displays the data after it is pressed.
+```dart
+class _BookFormPageState extends State<BookFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  String _title = "";
+  String _author = "";
+  String _genre = "";
+  String _summary = "";
+  int _price = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+          child: Text(
+            'Add Your Book',
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      drawer: const LeftDrawer(),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Title",
+                    labelText: "Title",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _title = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Title cannot be empty!";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              ...
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all(
+                          Theme.of(context).colorScheme.primary),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        if (_formKey.currentState!.validate()) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Book successfully saved'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Title: $_title'),
+                                      Text('Author: $_author'),
+                                      Text('Genre: $_genre'),
+                                      Text('Summary: $_summary'),
+                                      Text('price: $_price'),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: const Text('OK'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _formKey.currentState!.reset();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }
+                    },
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Redirect user when "Add Book" is pressed
+
+4. I created a new file called book_card.dart on the widgets directory and moved ItemHomePage and ItemCard from menu.dart to there
+5. I then added routing to BookFormPage when the 'Add Book' button is pressed
+```dart
+if (item.name == "Add Book") {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const BookFormPage()),
+  );
+}
+```
+
+### Create a drawer in the application
+
+6. I created a new file on widgets/ named left_drawer.dart. I then created two options: 'Home Page' that redirects you to the homepage and 'Add Book' that redirects you to the form.
+```dart
+import 'package:flutter/material.dart';
+import 'package:dog_eared_books/screens/menu.dart';
+import 'package:dog_eared_books/screens/book_form.dart';
+
+class LeftDrawer extends StatelessWidget {
+  const LeftDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: const Column(
+              children: [
+                Text(
+                  'Dog Eared Books',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Padding(padding: EdgeInsets.all(8)),
+                Text(
+                  'See Available Books Here!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text('Home Page'),
+            // Redirection part to MyHomePage
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(),
+                  ));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.inventory),
+            title: const Text('Add Book'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const BookFormPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## What is the purpose of const in Flutter? Explain the advantages of using const in Flutter code. When should we use const, and when should it not be used?
+const makes widgets immutable, meaning they don’t rebuild or recalculate when the widget tree updates. This immutability can significantly improve performance by reducing unnecessary rebuilds, which in turn enhances efficiency, lowers memory usage, and improves readability. const is best used for widgets that remain unchanged throughout the app’s lifecycle, as this allows the Flutter framework to optimize these widgets. However, it should be avoided for widgets that need to rebuild or whose values depend on runtime variables.
+
+## Explain and compare the usage of Column and Row in Flutter
+Column: Lays out children vertically
+```dart
+Column(
+  children: [
+    Text("Item 1"),
+    Text("Item 2"),
+    Text("Item 3"),
+  ],
+);
+```
+
+Row: Lays out children horizontally
+```dart
+Row(
+  children: [
+    Icon(Icons.star),
+    Text("Rating"),
+  ],
+);
+```
+
+## List the input elements you used on the form page in this assignment. Are there other Flutter input elements you didn’t use in this assignment? 
+Used: TextFormField for Title, Author, Genre, Summary, and Price.
+Other Elements: Checkbox, Switch, Slider, DropdownButton etc. These can be useful for boolean inputs, selecting from multiple choices, or adjusting values on a sliding scale.
+
+## How do you set the theme within a Flutter application to ensure consistency? Did you implement a theme in your application?
+You can use ThemeData in MaterialApp to define a consistent look across the app. And yes, I did implement a theme which was defined on main.dart
+```dart
+...
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.green,
+        ).copyWith(secondary: const Color.fromARGB(255, 36, 172, 43)),
+      ),
+...
+```
+
+</details>
