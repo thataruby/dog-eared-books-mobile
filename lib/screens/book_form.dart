@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/left_drawer.dart';
+import '../screens/menu.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'dart:convert';
 
 class BookFormPage extends StatefulWidget {
   const BookFormPage({super.key});
@@ -17,6 +21,7 @@ class _BookFormPageState extends State<BookFormPage> {
   int _price = 0;
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -92,7 +97,7 @@ class _BookFormPageState extends State<BookFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _author = value!;
+                      _genre = value!;
                     });
                   },
                   validator: (String? value) {
@@ -115,7 +120,7 @@ class _BookFormPageState extends State<BookFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _author = value!;
+                      _summary = value!;
                     });
                   },
                   validator: (String? value) {
@@ -165,42 +170,39 @@ class _BookFormPageState extends State<BookFormPage> {
                       backgroundColor: WidgetStateProperty.all(
                           Theme.of(context).colorScheme.primary),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        if (_formKey.currentState!.validate()) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Book successfully saved'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Title: $_title'),
-                                      Text('Author: $_author'),
-                                      Text('Genre: $_genre'),
-                                      Text('Summary: $_summary'),
-                                      Text('price: $_price'),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _formKey.currentState!.reset();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
+                          // Send request to Django and wait for the response
+                          final response = await request.postJson(
+                              "http://localhost:8000/create-flutter/",
+                              jsonEncode(<String, String>{
+                                  'title': _title,
+                                  'author': _author,
+                                  'genre': _genre,
+                                  'price': _price.toString(),
+                                  'summary': _summary,
+                              }),
                           );
-                        }
+                          if (context.mounted) {
+                              if (response['status'] == 'success') {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                  content: Text("New book has saved successfully!"),
+                                  ));
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                                  );
+                              } else {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                      content:
+                                          Text("Something went wrong, please try again."),
+                                  ));
+                              }
+                          }
                       }
-                    },
+                    } ,
                     child: const Text(
                       "Save",
                       style: TextStyle(color: Colors.white),

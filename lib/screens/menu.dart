@@ -7,7 +7,7 @@ class MyHomePage extends StatelessWidget {
   final String name = 'Athazahra Nabila Ruby';
   final String className = 'PBP KKI';
   final List<ItemHomepage> items = [
-    ItemHomepage("View Available Books", Icons.menu, Colors.green.shade800),
+    ItemHomepage("View Books", Icons.menu, Colors.green.shade800),
     ItemHomepage("Add Book", Icons.add, Colors.green.shade600),
     ItemHomepage("Logout", Icons.logout, Colors.green.shade200),
   ];
@@ -59,7 +59,7 @@ class MyHomePage extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                crossAxisCount: 2,
+                crossAxisCount: 3,
                 children: items.map((ItemHomepage item) {
                   return ItemCard(item);
                 }).toList(),

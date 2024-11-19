@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dog_eared_books/screens/menu.dart';
 import 'package:dog_eared_books/screens/book_form.dart';
+import 'package:dog_eared_books/screens/list_bookentry.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -50,13 +51,14 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.inventory),
-            title: const Text('Add Book'),
+            leading: const Icon(Icons.add_reaction_rounded),
+            title: const Text('Book List'),
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const BookFormPage()),
-              );
+                // Route to the book page
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BookEntryPage()),
+                );
             },
           ),
         ],
